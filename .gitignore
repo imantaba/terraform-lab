@@ -1,0 +1,7 @@
+*.tfstate
+*.tfstate.backup
+.terraform
+*.iml
+*.dot
+.terraform/*
+terraform-provider-*
