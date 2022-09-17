@@ -30,7 +30,7 @@ data "aws_availability_zones" "available" {
 # Outputs are printed by the CLI after `apply`.
 # this can reveal calculated values or other information
 # Also used in more advanced use cases :  modules, remote_state
-# Outputs can be retrieved at any time bu running `terraform output`
+# Outputs can be retrieved at any time by running `terraform output`
 output "bucket_info" {
   value = aws_s3_bucket.bucket1
 }
