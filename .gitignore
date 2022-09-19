@@ -5,3 +5,4 @@
 *.dot
 .terraform/*
 terraform-provider-*
+*.tfplan

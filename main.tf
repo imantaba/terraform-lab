@@ -1,5 +1,11 @@
 terraform {
   required_version = ">= 0.12.0"
+  backend "s3" {
+    bucket         = "avid-tfbackend"
+    key            = "terraform.tfstate"
+    region         = "eu-central-1"
+    dynamodb_table = "avid-tfbackend"
+  }
 }
 
 
