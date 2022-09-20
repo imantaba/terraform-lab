@@ -53,3 +53,77 @@ output "aws_availability_zones" {
 output "bucketname" {
   value = data.aws_caller_identity.current.account_id
 }
+
+
+provider "kubernetes" {
+  config_path    = "~/.kube/config"
+  config_context = "production.k8s.local"
+}
+
+resource "kubernetes_namespace" "terraform-first-namespace" {
+  metadata {
+    name = "tf-ns"
+  }
+}
+
+
+resource "kubernetes_deployment_v1" "example" {
+  metadata {
+    name = "tf-deployment-v1"
+    namespace = "tf-ns"
+    labels = {
+      app = "nginx"
+    }
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "nginx"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "nginx"
+        }
+      }
+
+      spec {
+        container {
+          image = "nginx:latest"
+          name  = "webserver"
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
+
+          liveness_probe {
+            http_get {
+              path = "/"
+              port = 80
+
+              http_header {
+                name  = "X-Custom-Header"
+                value = "Awesome"
+              }
+            }
+
+            initial_delay_seconds = 3
+            period_seconds        = 3
+          }
+        }
+      }
+    }
+  }
+}
