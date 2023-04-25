@@ -1,7 +1,11 @@
 locals {
+  aws_region       = "eu-central-1"
+  region       = "eu-central-1"
+  environment_name = "production"
   tags = {
-    Terraform = "true"
-    Environment = "dev"
+    ops_env              = "${local.environment_name}"
+    ops_managed_by       = "terraform",
+    ops_owners           = "devops",
   }
 }
 
