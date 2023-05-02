@@ -1,7 +1,9 @@
 locals {
   aws_region       = "eu-central-1"
-  region       = "eu-central-1"
+  region           = "eu-central-1"
+  azs              = slice(data.aws_availability_zones.available.names, 0, 3)
   environment_name = "production"
+  vpc_cidr         = "10.0.0.0/16"
   tags = {
     ops_env              = "${local.environment_name}"
     ops_managed_by       = "terraform",
@@ -9,6 +11,7 @@ locals {
   }
 }
 
+data "aws_availability_zones" "available" {}
 terraform {
   required_version = ">= 0.12.0"
   backend "s3" {
