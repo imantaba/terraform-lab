@@ -62,6 +62,8 @@ data "aws_iam_policy_document" "cluster_autoscaler" {
       "ec2:DescribeLaunchTemplateVersions",
       "ec2:DescribeInstanceTypes",
       "eks:DescribeNodegroup",
+      "ec2:DescribeImages",
+      "ec2:GetInstanceTypesFromInstanceRequirements"
     ]
 
     resources = ["*"]
@@ -432,10 +434,14 @@ data "aws_iam_policy_document" "external_secrets" {
   count = var.create_role && var.attach_external_secrets_policy ? 1 : 0
 
   statement {
+    actions   = ["ssm:DescribeParameters"]
+    resources = ["*"]
+  }
+
+  statement {
     actions = [
       "ssm:GetParameter",
       "ssm:GetParameters",
-      "ssm:DescribeParameters",
     ]
     resources = var.external_secrets_ssm_parameter_arns
   }
@@ -453,6 +459,13 @@ data "aws_iam_policy_document" "external_secrets" {
       "secretsmanager:ListSecretVersionIds",
     ]
     resources = var.external_secrets_secrets_manager_arns
+  }
+
+  statement {
+    actions = [
+      "kms:Decrypt"
+    ]
+    resources = var.external_secrets_kms_key_arns
   }
 }
 
@@ -858,6 +871,32 @@ data "aws_iam_policy_document" "load_balancer_controller" {
     condition {
       test     = "Null"
       variable = "aws:ResourceTag/elbv2.k8s.aws/cluster"
+      values   = ["false"]
+    }
+  }
+
+  statement {
+    actions = [
+      "elasticloadbalancing:AddTags"
+    ]
+    resources = [
+      "arn:${local.partition}:elasticloadbalancing:*:*:targetgroup/*/*",
+      "arn:${local.partition}:elasticloadbalancing:*:*:loadbalancer/net/*/*",
+      "arn:${local.partition}:elasticloadbalancing:*:*:loadbalancer/app/*/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "elasticloadbalancing:CreateAction"
+      values = [
+        "CreateTargetGroup",
+        "CreateLoadBalancer",
+      ]
+    }
+
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/elbv2.k8s.aws/cluster"
       values   = ["false"]
     }
   }
