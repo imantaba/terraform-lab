@@ -70,3 +70,12 @@ output "cluster_tls_certificate_sha1_fingerprint" {
   description = "The SHA1 fingerprint of the public key of the cluster's certificate"
   value       = module.eks.cluster_tls_certificate_sha1_fingerprint
 }
+
+################################################################################
+# Cert-manager
+# ################################################################################
+output "cert_manager_irsa_role_arn" {
+  value = module.cert_manager_irsa_role.iam_role_arn
+}
+
+
